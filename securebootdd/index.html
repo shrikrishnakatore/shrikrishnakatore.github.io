@@ -79,6 +79,24 @@
       margin: 20px 0;
       border-radius: 4px;
     }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 20px 0;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .image-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .image-caption {
+      font-style: italic;
+      color: #666;
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
   </style>
 </head>
 <body>
@@ -107,41 +125,64 @@
              security controls are used to protect it, and communication channels are used to access it.
             </li>
         </ul>
-        <!-- Add your notes here -->
+        
+        <div class="step-title" style="margin-top: 30px;">Why the need for secure boot?</div>
+        <p>Secure boot is needed to ensure an embedded device only runs authentic, untampered firmware from power-on, blocking persistent malware and unauthorized changes that could compromise safety, data, or networks. It is more important in devices which connect to the internet and support over-the-air updates, to avoid malicious attacks and unauthorized access to devices.</p>
       </div>
     </div>
     
     <!-- Step 2 -->
     <div class="step">
       <div class="step-number">Step 2: Prerequisites</div>
-      <div class="step-title">What You Need</div>
+      <div class="step-title"> Hardware must support secure boot, usually flash protection!</div>
       <div class="step-content">
-        <p>Before starting, make sure you have:</p>
         <ul>
-          <li>Hardware that supports Secure Boot</li>
-          <li>Administrative access</li>
-          <!-- Add more prerequisites as needed -->
         </ul>
+        <p>To make the boot loader secure, we must have a hashing algorithm, such as SHA-256, ready to generate a firmware digest for the application image, and public and private keys to sign the firmware digest and metadata, using an algorithm like RSA-2048/256-bit or ECDSA.</p>
+        
+        <p><strong>Three Important Parts of Secure Boot:</strong></p>
+        
+        <p><strong>1. Firmware Confidentiality:</strong> This is achieved by making the flash read-protected, so it cannot be read by any external entity. This is particularly used for the bootloader to prevent unauthorized access to the firmware code.</p>
+        
+        <p><strong>2. Firmware Integrity:</strong> This is achieved by hashing the firmware image using SHA-256 algorithms to generate the hash/firmware digest, which is then stored at a secure location. This ensures that any tampering with the firmware can be detected.</p>
+        
+        <p><strong>3. Firmware Authenticity:</strong> This is achieved by signing the image and then verifying the signature before starting the application, using algorithms like RSA or ECDSA. This process uses private and public keys, with the public key stored at a fixed flash address to be used by the bootloader to verify the signature.</p>
       </div>
     </div>
     
     <!-- Step 3 -->
     <div class="step">
       <div class="step-number">Step 3: Configuration</div>
+      <div class="step-title">Flash memory layout configuration:</div>
+      <p>To set up secure boot, the bootloader and the application must be built and stored
+      separately. Reserve two dedicated flash regions: one for the bootloader at the beginning of flash, and another for the application. Additionally, reserve a fixed flash address for the
+      public key used for signature verification—commonly placed immediately after the bootloader and before the application.
+      This public key region can be at any fixed flash location, but it must be protected, immutable, and treated as secure.</p>
       <div class="step-title">Setting Up Secure Boot</div>
       <div class="step-content">
-        <p>Configure your system for Secure Boot.</p>
+        <p>First, we have to secure the flash region where the boot loader is located, so that this memory cannot be accessed by anything other than the bootloader code. On STM microcontrollers, this can be achieved using the secure flash page option. Additionally, we must make the bootloader flash memory region write-protected, so that it cannot be overwritten or erased.</p>
         <!-- Add your configuration steps here -->
       </div>
     </div>
     
     <!-- Step 4 -->
     <div class="step">
-      <div class="step-number">Step 4: Verification</div>
-      <div class="step-title">Verifying Secure Boot</div>
+      <div class="step-number">Step 4: Signature Generation and Verification</div>
+      <div class="step-title">Signature Generation and Verification Flow</div>
       <div class="step-content">
-        <p>Verify that Secure Boot is working correctly.</p>
-        <!-- Add verification steps here -->
+        <p><strong>1. Signature Generation</strong></p>
+        <p>Signature generation is the process of creating a cryptographic signature for firmware or boot images to ensure their integrity and authenticity.</p>
+        <div class="image-container">
+          <img src="signatureGeneration.jpg" alt="Signature Generation Flow">
+          <div class="image-caption">Figure 1: Signature Generation Flow</div>
+        </div>
+        
+        <p><strong>2. Signature Verification Flow</strong></p>
+        <p>Signature verification is the process of validating the cryptographic signature during the boot process to ensure the firmware has not been tampered with.</p>
+        <div class="image-container">
+          <img src="signatureVerification.jpg" alt="Signature Verification Flow">
+          <div class="image-caption">Figure 2: Signature Verification Flow</div>
+        </div>
       </div>
     </div>
     
